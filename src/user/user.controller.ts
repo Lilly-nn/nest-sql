@@ -1,14 +1,13 @@
-import { Controller, Get, Post, Body } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { UserDto } from "./user.dto";
+import { UpdateUserDto, UserDto } from "./user.dto";
 
 @Controller("users")
 export class UserController {
   constructor(private userService: UserService) {}
   @Get()
-  async getUsers() {
-    const users = await this.userService.getAllUsers();
-    return users;
+  getUsers() {
+    return this.userService.getAllUsers();
   }
 
   @Post("/create")
@@ -18,5 +17,10 @@ export class UserController {
     }
     const user = await this.userService.createUser(userInfo);
     return user;
+  }
+
+  @Patch("/:id")
+  async updateUser(@Param("id", ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+    await this.userService.updateUser(id, updateUserDto);
   }
 }
