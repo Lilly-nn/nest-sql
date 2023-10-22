@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Delete, Param, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Delete, Param, ParseIntPipe, UsePipes, ValidationPipe } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UpdateUserDto, UserDto } from "./user.dto";
 
@@ -11,10 +11,9 @@ export class UserController {
   }
 
   @Post("/create")
+  @UsePipes(new ValidationPipe())
   async createUser(@Body() userDto: UserDto) {
-    const { confirmPassword, ...userInfo } = userDto;
-    if (!confirmPassword) return;
-    const user = await this.userService.createUser(userInfo);
+    const user = await this.userService.createUser(userDto);
     return user;
   }
 

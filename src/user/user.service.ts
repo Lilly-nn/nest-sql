@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { User } from "./user.entity";
 import { UserType } from "./user.type";
 import * as bcrypt from "bcrypt";
+import { UserDto } from "./user.dto";
 
 @Injectable()
 export class UserService {
@@ -17,8 +18,12 @@ export class UserService {
     return users;
   }
 
-  async createUser(userInfo: UserType): Promise<User> {
-    const hashedPassword = await bcrypt.hash(userInfo.password, 6);
+  async createUser(userInfo: UserDto): Promise<User> {
+    const { password, confirmPassword } = userInfo;
+    if (password !== confirmPassword) {
+      throw new HttpException("Passwords do not match", HttpStatus.BAD_REQUEST);
+    }
+    const hashedPassword = await bcrypt.hash(password, 6);
     const secureUserInfo = {
       ...userInfo,
       password: hashedPassword,
