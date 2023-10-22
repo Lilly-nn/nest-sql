@@ -1,10 +1,12 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { PostModule } from "./post/post.module";
 import { User } from "./user/user.entity";
 import { UserModule } from "./user/user.module";
-import { ConfigModule } from "@nestjs/config";
+import { Post } from "./post/post.entity";
 
 @Module({
   imports: [
@@ -16,12 +18,13 @@ import { ConfigModule } from "@nestjs/config";
       username: process.env.SQL_USERNAME,
       password: process.env.SQL_PASSWORD,
       database: process.env.SQL_NAME,
-      entities: [User],
+      entities: [User, Post],
       synchronize: true,
       retryAttempts: 8,
       autoLoadEntities: false,
     }),
     UserModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
