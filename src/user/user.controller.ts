@@ -13,8 +13,7 @@ export class UserController {
   @Post("/create")
   async createUser(@Body() userDto: UserDto) {
     const { confirmPassword, ...userInfo } = userDto;
-    if (confirmPassword) {
-    }
+    if (!confirmPassword) return;
     const user = await this.userService.createUser(userInfo);
     return user;
   }

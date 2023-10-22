@@ -28,18 +28,20 @@ export class UserService {
   }
 
   async updateUser(userId: number, updateDetails: UserType) {
-    const user = await this.usersRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new HttpException("Such user doesn't exist", HttpStatus.NOT_FOUND);
-    }
+    await this.findUser(userId);
     await this.usersRepository.update({ id: userId }, { ...updateDetails });
   }
 
   async deleteUser(userId: number) {
-    const user = await this.usersRepository.findOneBy({ id: userId });
+    await this.findUser(userId);
+    await this.usersRepository.delete({ id: userId });
+  }
+
+  async findUser(id: number) {
+    const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new HttpException("Such user doesn't exist", HttpStatus.NOT_FOUND);
     }
-    await this.usersRepository.delete({ id: userId });
+    return user;
   }
 }

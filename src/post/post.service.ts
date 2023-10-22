@@ -14,6 +14,15 @@ export class PostService {
     private usersRepository: Repository<User>,
   ) {}
 
+  async findPosts() {
+    return this.postsRepository.find({ relations: ["user"] });
+  }
+
+  async findPost(id: number) {
+    const post = await this.findPostById(id);
+    return post;
+  }
+
   async createPost(postDto: CreatePostDto) {
     const { userId } = postDto;
     const user = await this.usersRepository.findOneBy({ id: userId });
@@ -22,5 +31,18 @@ export class PostService {
     }
     const newPost = this.postsRepository.create({ ...postDto, createdAt: new Date(), user });
     return this.postsRepository.save(newPost);
+  }
+
+  async deletePost(id: number) {
+    await this.findPostById(id);
+    await this.postsRepository.delete({ id });
+  }
+
+  private async findPostById(id: number) {
+    const post = await this.postsRepository.findOneBy({ id });
+    if (!post) {
+      throw new HttpException("Such post doesn't exist", HttpStatus.NOT_FOUND);
+    }
+    return post;
   }
 }
