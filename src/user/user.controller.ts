@@ -1,20 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Delete, Param, ParseIntPipe, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Delete, Param, ParseIntPipe, UsePipes, ValidationPipe, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UpdateUserDto, UserDto } from "./user.dto";
+import { SerializedUser } from "./user.type";
 
 @Controller("users")
 export class UserController {
   constructor(private userService: UserService) {}
+
   @Get()
-  getUsers() {
-    return this.userService.getAllUsers();
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getUsers() {
+    const users = await this.userService.getAllUsers();
+    return users.map(user => new SerializedUser(user));
   }
 
   @Post("/create")
+  @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes(new ValidationPipe())
   async createUser(@Body() userDto: UserDto) {
     const user = await this.userService.createUser(userDto);
-    return user;
+    return new SerializedUser(user);
   }
 
   @Patch("/:id")
